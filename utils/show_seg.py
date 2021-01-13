@@ -68,4 +68,4 @@ print(pred_choice)
 pred_color = cmap[pred_choice.numpy()[0], :]
 
 #print(pred_color.shape)
-showpoints(point_np,  pred_color, gt)
+showpoints(point_np, gt,  pred_color)

@@ -109,9 +109,14 @@ class ShapeNetDataset(data.Dataset):
                               lll=lll+1
                               if(lll>2000):
                                   break
-                              cr=k3[i]['room_corners']
-                              #print("room corners are",cr)
-                              mask=np.zeros((256,256),dtype=np.uint8)
+                              #cr=[]
+
+                              cr=(k3[i]['room_corners'])
+                              for knmn in range(len(cr)):
+                                      cr[knmn]=[cr[knmn]]
+                              cr=[(np.array(cr,dtype=np.int32))]
+                              
+                              """mask=np.zeros((256,256),dtype=np.uint8)
                               mask[k3[i]['mask_large']!=False]=1
                               mask.resize((256,256))
                               mask[mask>0]=1
@@ -120,7 +125,7 @@ class ShapeNetDataset(data.Dataset):
             
                               cr, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
            
-                              #print("cr contour is",cr)
+                              print("cr contour is",cr[0].type)"""
                               """if len(cr) > 0:              
                                  cr = [c for c in cr] 
                               cr_new=np.squeeze(cr[0])
@@ -176,6 +181,8 @@ class ShapeNetDataset(data.Dataset):
                               points_final=[]
                               cnt_m=np.zeros((256,256), dtype='uint8')
                               cv2.drawContours(cnt_m,cr,-1,(256,256,256),1)
+                              #plt.imshow(cnt_m)
+                              #plt.show()
                               points_cc=[]
                               for k in range(256):
                                   for j in range(256):
@@ -243,7 +250,7 @@ class ShapeNetDataset(data.Dataset):
                                    #      hm=1
                                          #print(points_cc[k])
                                   hm=float(hm)
-                                  seg_final.append((hm+1)/6)
+                                  seg_final.append((hm+1))
                                   #else:
                                    #   seg_final.append(0)
                               #print(len(seg_final),len(points_final))
@@ -262,8 +269,8 @@ class ShapeNetDataset(data.Dataset):
             for line in f:
                 ls = line.strip().split()
                 self.seg_classes[ls[0]] = int(ls[1])
-        self.num_seg_classes = 1
-        self.num_sef_class=1#self.seg_classes[list(self.cat.keys())[0]]
+        self.num_seg_classes = 8
+        self.num_sef_class=8#self.seg_classes[list(self.cat.keys())[0]]
         print(self.seg_classes, self.num_seg_classes)
 
     def __getitem__(self, index):
@@ -307,7 +314,7 @@ class ShapeNetDataset(data.Dataset):
             #points_cc=[]
             #plt.imshow(cnt_m)
             #plt.show()
-        seg = fn[1].astype(np.float32)
+        seg = fn[1].astype(np.int32)
         #print("seg", np.unique(seg))
 
         choice = np.random.choice(len(seg), self.npoints, replace=True)
