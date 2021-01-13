@@ -67,6 +67,7 @@ class ShapeNetDataset(data.Dataset):
         self.root = root
         self.catfile = os.path.join(self.root, 'synsetoffset2category.txt')
         self.cat = {}
+        self.split=split
         self.data_augmentation = data_augmentation
         self.classification = classification
         self.seg_classes = {}
@@ -98,7 +99,7 @@ class ShapeNetDataset(data.Dataset):
         self.datapath = []
         with open("../fs_data/public_100/processed/seperate_room_data/test/list.txt") as fp: 
                     Lines = fp.readlines() 
-                    lll=0
+                    lll=-1
                     for line in Lines: 
                         line="../fs_data/public_100/processed/seperate_room_data/test/"+line[:-1]
                         k=np.load(line,allow_pickle=True)
@@ -107,9 +108,11 @@ class ShapeNetDataset(data.Dataset):
                         k3=k.tolist()['room_instances_annot']
                         for i in range(len(k3)):
                               lll=lll+1
-                              if(lll>2000):
-                                  break
+                              if(self.split=='train') & (lll<=100):
+                                  continue
                               #cr=[]
+                              elif(self.split=='test') & (lll>100):
+                                 continue
 
                               cr=(k3[i]['room_corners'])
                               for knmn in range(len(cr)):
@@ -201,21 +204,21 @@ class ShapeNetDataset(data.Dataset):
                                       if (points_cc[k][0]==cr[0][kmn][0][0] )&(cr[0][kmn][0][1]==points_cc[k][1]):
                                           
                                           hm=5
-                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<2)&(abs(cr[0][kmn][0][1]-points_cc[k][1])<2):
+                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<2)&(abs(cr[0][kmn][0][1]-points_cc[k][1])<2+2):
                                           if(hm<4):   
                                               hm=4
-                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<3 )&(abs(cr[0][kmn][0][1]-points_cc[k][1])<3):
+                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<3 )&(abs(cr[0][kmn][0][1]-points_cc[k][1])<3+2):
                                           
                                           if(hm<3):   
                                               hm=3
                                           #hm=0.9
-                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<4 )&(abs(cr[0][kmn][0][1]-points_cc[k][1])<4):
+                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<4 )&(abs(cr[0][kmn][0][1]-points_cc[k][1])<4+2):
                                           
                                           if(hm<2):   
                                               hm=2
                                           #hm=0.8
                                           
-                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<5)&(abs(cr[0][kmn][0][1]-points_cc[k][1])<5):
+                                      elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<5)&(abs(cr[0][kmn][0][1]-points_cc[k][1])<5+2):
                                           
                                           if(hm<1):   
                                               hm=1
@@ -269,8 +272,8 @@ class ShapeNetDataset(data.Dataset):
             for line in f:
                 ls = line.strip().split()
                 self.seg_classes[ls[0]] = int(ls[1])
-        self.num_seg_classes = 8
-        self.num_sef_class=8#self.seg_classes[list(self.cat.keys())[0]]
+        self.num_seg_classes = 7
+        self.num_sef_class=7#self.seg_classes[list(self.cat.keys())[0]]
         print(self.seg_classes, self.num_seg_classes)
 
     def __getitem__(self, index):
@@ -314,7 +317,7 @@ class ShapeNetDataset(data.Dataset):
             #points_cc=[]
             #plt.imshow(cnt_m)
             #plt.show()
-        seg = fn[1].astype(np.int32)
+        seg = fn[1].astype(np.int64)
         #print("seg", np.unique(seg))
 
         choice = np.random.choice(len(seg), self.npoints, replace=True)
