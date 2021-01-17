@@ -101,17 +101,23 @@ class ShapeNetDataset(data.Dataset):
                     Lines = fp.readlines() 
                     lll=-1
                     for line in Lines: 
+                        for ri in range(len(5):
+                                xi=random.randint(50, 250)
+                                yi=random.randint(50,250)
                         line="../fs_data/public_100/processed/seperate_room_data/test/"+line[:-1]
                         k=np.load(line,allow_pickle=True)
-                        if(lll>2000):
+                        if(lll>20000):
                             break
                         k3=k.tolist()['room_instances_annot']
                         for i in range(len(k3)):
                               lll=lll+1
-                              if(self.split=='train') & (lll<=100):
+                              print(self.split)
+                              if(self.split=='train') & (lll<=101):
                                   continue
                               #cr=[]
-                              elif(self.split=='test') & (lll>100):
+                              #if(lll>=40):
+                               #   break
+                              elif(self.split=='test') & (lll>101):
                                  continue
 
                               cr=(k3[i]['room_corners'])
@@ -119,16 +125,16 @@ class ShapeNetDataset(data.Dataset):
                                       cr[knmn]=[cr[knmn]]
                               cr=[(np.array(cr,dtype=np.int32))]
                               
-                              """mask=np.zeros((256,256),dtype=np.uint8)
+                              mask=np.zeros((256,256),dtype=np.uint8)
                               mask[k3[i]['mask_large']!=False]=1
                               mask.resize((256,256))
                               mask[mask>0]=1
                               mask[mask<0]=0
                               ret,thresh=cv2.threshold(mask,127,255,0)
             
-                              cr, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                              #cr2, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
            
-                              print("cr contour is",cr[0].type)"""
+                              #print("cr contour is",cr[0].type)"""
                               """if len(cr) > 0:              
                                  cr = [c for c in cr] 
                               cr_new=np.squeeze(cr[0])
@@ -178,14 +184,29 @@ class ShapeNetDataset(data.Dataset):
                                  cr = [c for c in cr]
 
                               #mask_o=mask_o.resize((256,256))"""
-
-                              
+                              #if len(cr2) > 0:              
+                              #   cr2 = [c for c in cr2]
+                              #print("len crs is", len(cr[0]),len(cr2[0]))
+                              #print("cr",cr[0])
                               mask_out=np.zeros((256,256),dtype=np.uint8)
                               points_final=[]
+                              """skip=0
+                              for ksi in range(len(cr[0])-1):
+                                  if (cr[0][ksi][0][0]==cr[0][ksi+1][0][0]):
+                                      if(abs(cr[0][ksi][0][1]-cr[0][ksi+1][0][1])<15):
+                                          skip=1
+                                  if (cr[0][ksi][0][1]==cr[0][ksi+1][0][1]):
+                                      if(abs(cr[0][ksi][0][0]-cr[0][ksi+1][0][0])<15):
+                                          skip=1
+                              #if (skip==1):
+                              #    print("refine")
+                              #    continue"""
                               cnt_m=np.zeros((256,256), dtype='uint8')
                               cv2.drawContours(cnt_m,cr,-1,(256,256,256),1)
-                              #plt.imshow(cnt_m)
-                              #plt.show()
+                              """if(lll==9) |(lll==14) | (lll==78) | (lll==57) |(lll==51):
+                                 print(cr)
+                                 plt.imshow(cnt_m)
+                                 plt.show()"""
                               points_cc=[]
                               for k in range(256):
                                   for j in range(256):
@@ -266,6 +287,87 @@ class ShapeNetDataset(data.Dataset):
          #   for fn in self.meta[item]:
                               self.datapath.append((np.array(points_final),seg_final))
 
+
+                    Lines = fp.readlines() 
+                    lll=-1
+                    for line in Lines: 
+                        for ri in range(len(5):
+                                xi=random.randint(50, 250)
+                                yi=random.randint(50,250)
+                                line="../fs_data/public_100/processed/seperate_room_data/test/"+line[:-1]
+                                k=np.load(line,allow_pickle=True)
+                                if(lll>20000):
+                                       break
+                                k3=k.tolist()['room_instances_annot']
+                                for i in range(len(k3)):
+                                     lll=lll+1
+                                     if(self.split=='train') & (lll<=101):
+                                         continue
+                                     elif(self.split=='test') & (lll>101):
+                                          continue
+
+                                     cr=(k3[i]['room_corners'])
+                                     for knmn in range(len(cr)):
+                                          cr[knmn]=[cr[knmn]]
+                                     cr=[(np.array(cr,dtype=np.int32))]
+                              
+                                     mask=np.zeros((256,256),dtype=np.uint8)
+                                     mask[k3[i]['mask_large']!=False]=1
+                                     mask.resize((256,256))
+                                     mask[mask>0]=1
+                                     mask[mask<0]=0
+                                     ret,thresh=cv2.threshold(mask,127,255,0)
+            
+                                     mask_out=np.zeros((256,256),dtype=np.uint8)
+                                     points_final=[]
+                                     #for smk in range(len(cr[0]):
+                                        
+                                     cnt_m=np.zeros((256,256), dtype='uint8')
+                                     cv2.drawContours(cnt_m,cr,-1,(256,256,256),1)
+                                     points_cc=[]
+                                     cnt_m[:xi][:yi]=0
+                                     plt.imshow(cnt_m)
+                                     plt.show()
+                                     for k in range(256):
+                                     for j in range(256):
+                                         if(cnt_m[k][j]!=0):
+                                              points_final.append([(j-128)/128,(k-128)/128,0])
+                                              points_cc.append([j,k])
+                                     seg_final=[]
+                                     cr=np.array(cr)
+                              
+                                      for k in range(len(points_final)):
+                                           hm=0     
+                                           for kmn in range(len(cr[0])):
+                                                   
+                                                  if (points_cc[k][0]==cr[0][kmn][0][0] )&(cr[0][kmn][0][1]==points_cc[k][1]):
+                                          
+                                                        hm=5
+                                                  elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<2)&(abs(cr[0][kmn][0][1]-points_cc[k][1])<2+2):
+                                                         if(hm<4):   
+                                                            hm=4
+                                                  elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<3 )&(abs(cr[0][kmn][0][1]-points_cc[k][1])<3+2):
+                                          
+                                                       if(hm<3):   
+                                                            hm=3
+                                                  elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<4 )&(abs(cr[0][kmn][0][1]-points_cc[k][1])<4+2):
+                                          
+                                                      if(hm<2):   
+                                                            hm=2
+                                          
+                                                  elif (abs(points_cc[k][0]-cr[0][kmn][0][0])<5)&(abs(cr[0][kmn][0][1]-points_cc[k][1])<5+2):
+                                          
+                                                     if(hm<1):   
+                                                         hm=1
+                                            hm=float(hm)
+                                           seg_final.append((hm+1))
+                                           seg_final=np.array(seg_final)
+                              
+                                if(len(np.array(points_final)==len(seg_final)):
+                                      self.datapath.append((np.array(points_final),seg_final))
+
+
+
         self.classes = dict(zip(sorted(self.cat), range(len(self.cat))))
         print(self.classes)
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../misc/num_seg_classes.txt'), 'r') as f:
@@ -275,7 +377,7 @@ class ShapeNetDataset(data.Dataset):
         self.num_seg_classes = 7
         self.num_sef_class=7#self.seg_classes[list(self.cat.keys())[0]]
         print(self.seg_classes, self.num_seg_classes)
-
+        print("l",len(self.datapath))
     def __getitem__(self, index):
         fn = self.datapath[index]
         #print("hhuihihiohoihhioohiohiohou") 
@@ -353,7 +455,7 @@ class ShapeNetDataset(data.Dataset):
 class ModelNetDataset(data.Dataset):
     def __init__(self,
                  root,
-                 npoints=2500,
+                 npoints=1000,
                  split='train',
                  data_augmentation=True):
         self.npoints = npoints
